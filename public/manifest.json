@@ -1,0 +1,17 @@
+{
+  "name": "LIC Enterprise Management System",
+  "short_name": "LIC EMS",
+  "description": "Internal LIC staff portal for managing agents, customers, policies, premiums, and notifications.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef2ff",
+  "theme_color": "#0f3d91",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
