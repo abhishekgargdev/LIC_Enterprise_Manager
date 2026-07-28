@@ -1,0 +1,8 @@
+import { NextResponse } from "next/server"
+import { connectDB } from "@/lib/db"
+import { getSession } from "@/lib/auth"
+import { Lead } from "@/models/Lead"
+import { Customer } from "@/models/Customer"
+import { User } from "@/models/User"
+import { Branch } from "@/models/Branch"
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) { await connectDB(); const session = await getSession(); const { id } = await params; if (!session) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 }); const lead = await Lead.findById(id); if (!lead) return NextResponse.json({ success: false, error: "Lead not found" }, { status: 404 }); if (lead.convertedToCustomer) return NextResponse.json({ success: false, error: "Lead is already converted." }, { status: 400 }); const body = await request.json(); if (!body.dob || !body.gender || !body.address?.line1 || !body.address?.city || !body.address?.state || !body.address?.pincode) return NextResponse.json({ success: false, error: "Complete the customer details before converting this lead." }, { status: 400 }); const agent = await User.findById(lead.agent); const branch = agent ? await Branch.findOne({ code: agent.branch }) : null; if (!agent || !branch) return NextResponse.json({ success: false, error: "Lead owner has no valid branch." }, { status: 400 }); const customer = await Customer.create({ ...body, name: lead.name, mobile: lead.mobile, email: lead.email || body.email, agent: agent._id, branch: branch._id, isActive: true }); lead.stage = "CONVERTED"; lead.convertedToCustomer = customer._id; await lead.save(); return NextResponse.json({ success: true, data: customer }) }

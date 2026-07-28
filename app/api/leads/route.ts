@@ -1,0 +1,7 @@
+import { NextResponse } from "next/server"
+import { connectDB } from "@/lib/db"
+import { getSession } from "@/lib/auth"
+import { Lead } from "@/models/Lead"
+import { User } from "@/models/User"
+export async function GET(request: Request) { await connectDB(); const session = await getSession(); if (!session) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 }); const p = new URL(request.url).searchParams; const filter: Record<string, unknown> = {}; if (session.role === "AGENT") filter.agent = session.userId; else if (session.role === "DEVELOPMENT_OFFICER") filter.agent = { $in: await User.find({ manager: session.userId }).distinct("_id") }; if (p.get("stage")) filter.stage = p.get("stage"); if (p.get("agent")) filter.agent = p.get("agent"); return NextResponse.json({ success: true, data: await Lead.find(filter).populate("agent", "name").sort({ nextFollowUpDate: 1 }).lean() }) }
+export async function POST(request: Request) { await connectDB(); const session = await getSession(); if (!session) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 }); const body = await request.json(); const agentId = session.role === "AGENT" ? session.userId : body.agentId; if (!body.name || !body.mobile || !body.source || !agentId) return NextResponse.json({ success: false, error: "Name, mobile, source, and agent are required." }, { status: 400 }); const lead = await Lead.create({ ...body, agent: agentId }); return NextResponse.json({ success: true, data: lead }) }
