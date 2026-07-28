@@ -21,6 +21,7 @@ export type RouteHref =
   | "/dashboard/hierarchy"
   | "/dashboard/regions"
   | "/dashboard/branches"
+  | "/dashboard/policy-assignment"
 
 export type NavigationItem = {
   title: string
@@ -90,6 +91,7 @@ const navigationItems: NavigationItem[] = [
     icon: Users,
     roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"],
   },
+  { title: "Policy assignment", href: "/dashboard/policy-assignment", icon: Users2, roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"] },
   {
     title: "Regions",
     href: "/dashboard/regions",
