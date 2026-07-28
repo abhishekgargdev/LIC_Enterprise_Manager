@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth"
 import { buildAccessFilter, canCreateRole, type UserRole } from "@/lib/permissions"
 import { Branch } from "@/models/Branch"
 import { User } from "@/models/User"
+import { notify } from "@/lib/notifications"
 
 const roles: UserRole[] = ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"]
 
@@ -82,6 +83,14 @@ export async function POST(request: Request) {
   try {
     const managerId = typeof manager === "string" ? manager : manager?._id
     const user = await User.create({ name: name.trim(), email: email.toLowerCase().trim(), phone, role, branch, region: branchRecord?.region, manager: managerId || undefined, passwordHash: await hash(initialPassword, 12), joiningDate: new Date(), isActive: true, ...(role === "AGENT" ? { agentCode: code } : { employeeCode: code }) })
+    if (role === "AGENT" && managerId) {
+      await notify(managerId.toString(), "NEW_ASSIGNMENT", {
+        title: "New Agent Assignment",
+        message: `Agent ${user.name} has been assigned to you.`,
+        link: "/dashboard/team",
+        relatedId: user._id.toString()
+      })
+    }
     return NextResponse.json({ success: true, data: user.toObject(), temporaryPassword: initialPassword })
   } catch (error: unknown) {
     if (error?.code === 11000) return NextResponse.json({ success: false, error: "A user with that email already exists." }, { status: 409 })

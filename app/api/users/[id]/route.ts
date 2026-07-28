@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db"
 import { getSession } from "@/lib/auth"
 import { canCreateRole } from "@/lib/permissions"
 import { User } from "@/models/User"
+import { notify } from "@/lib/notifications"
 
 async function accessible(id: string) {
   const session = await getSession()
@@ -30,7 +31,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!canCreateRole(session, body.role)) return NextResponse.json({ success: false, error: "You cannot assign this role." }, { status: 403 })
     updates.role = body.role
   }
-  if (body.managerId && user.role === "AGENT") updates.manager = body.managerId
+  if (body.managerId && user.role === "AGENT") {
+    if (String(user.manager || "") !== String(body.managerId)) {
+      updates.manager = body.managerId
+      await notify(body.managerId, "NEW_ASSIGNMENT", {
+        title: "New Agent Assignment",
+        message: `Agent ${user.name} has been assigned to you.`,
+        link: "/dashboard/team",
+        relatedId: user._id.toString()
+      })
+    }
+  }
   Object.assign(user, updates); await user.save()
   return NextResponse.json({ success: true, data: user.toObject() })
 }

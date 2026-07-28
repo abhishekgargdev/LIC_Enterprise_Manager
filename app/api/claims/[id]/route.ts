@@ -4,8 +4,8 @@ import { getSession } from "@/lib/auth"
 import { Claim } from "@/models/Claim"
 import { Policy } from "@/models/Policy"
 import { PolicyHistory } from "@/models/PolicyHistory"
-import { Notification } from "@/models/Notification"
 import { User } from "@/models/User"
+import { notify } from "@/lib/notifications"
 
 const next: Record<string, string[]> = { PENDING: ["UNDER_REVIEW"], UNDER_REVIEW: ["APPROVED", "REJECTED"], APPROVED: ["SETTLED"], REJECTED: [], SETTLED: [] }
 
@@ -71,9 +71,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   await claim.save()
 
-  if (body.status === "SETTLED") {
+  if (body.status) {
     const policy = await Policy.findById(claim.policy)
-    if (policy) {
+    const agentId = policy?.agent || claim.filedBy
+    
+    await notify(agentId.toString(), "CLAIM_STATUS_CHANGE", {
+      title: "Claim Status Update",
+      message: `Claim ${claim.claimNumber} status has changed to ${body.status}.`,
+      link: `/dashboard/claims/${claim._id}`,
+      relatedId: claim._id.toString()
+    })
+
+    if (body.status === "SETTLED" && policy) {
       const oldStatus = policy.status
       policy.status = "CLAIM_SETTLED"
       await policy.save()
@@ -90,38 +99,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       const agentUser = await User.findById(policy.agent)
       const managerId = policy.manager || agentUser?.manager
 
-      await Notification.updateOne(
-        { dedupeKey: `claim-settled-agent-${claim._id}` },
-        {
-          $setOnInsert: {
-            recipient: policy.agent,
-            type: "CLAIM_SETTLED",
-            title: "Claim settled",
-            message: `Claim ${claim.claimNumber} for policy ${policy.policyNumber} has been settled.`,
-            entityType: "Claim",
-            entityId: claim._id.toString(),
-            dedupeKey: `claim-settled-agent-${claim._id}`
-          }
-        },
-        { upsert: true }
-      )
+      await notify(policy.agent.toString(), "CLAIM_SETTLED", {
+        title: "Claim settled",
+        message: `Claim ${claim.claimNumber} for policy ${policy.policyNumber} has been settled.`,
+        link: `/dashboard/claims/${claim._id}`,
+        relatedId: claim._id.toString(),
+        dedupeKey: `claim-settled-agent-${claim._id}`
+      })
 
       if (managerId) {
-        await Notification.updateOne(
-          { dedupeKey: `claim-settled-manager-${claim._id}` },
-          {
-            $setOnInsert: {
-              recipient: managerId,
-              type: "CLAIM_SETTLED",
-              title: "Claim settled",
-              message: `Claim ${claim.claimNumber} for policy ${policy.policyNumber} has been settled.`,
-              entityType: "Claim",
-              entityId: claim._id.toString(),
-              dedupeKey: `claim-settled-manager-${claim._id}`
-            }
-          },
-          { upsert: true }
-        )
+        await notify(managerId.toString(), "CLAIM_SETTLED", {
+          title: "Claim settled",
+          message: `Claim ${claim.claimNumber} for policy ${policy.policyNumber} has been settled.`,
+          link: `/dashboard/claims/${claim._id}`,
+          relatedId: claim._id.toString(),
+          dedupeKey: `claim-settled-manager-${claim._id}`
+        })
       }
     }
   }
