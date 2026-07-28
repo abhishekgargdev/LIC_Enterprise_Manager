@@ -63,11 +63,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   return NextResponse.json({ success: true, data: user.toObject() })
 }
 
-export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDB(); const { id } = await params; const { session, user } = await accessible(id)
   if (!session) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
   if (!user) return NextResponse.json({ success: false, error: "User not found or forbidden." }, { status: 404 })
   if (session.userId === id) return NextResponse.json({ success: false, error: "You cannot deactivate your own account." }, { status: 400 })
+  const oldValue = { isActive: user.isActive }
   user.isActive = false; await user.save()
+  await logAction(session, "DEACTIVATED_USER", "User", user._id.toString(), oldValue, { isActive: false }, request)
   return NextResponse.json({ success: true, data: { id } })
 }

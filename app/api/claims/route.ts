@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth"
 import { Claim } from "@/models/Claim"
 import { Policy } from "@/models/Policy"
 import { Branch } from "@/models/Branch"
+import { logAction } from "@/lib/audit"
 
 async function getPolicyScope(session: NonNullable<Awaited<ReturnType<typeof getSession>>>) {
   if (session.role === "SUPER_ADMIN") return {}
@@ -81,6 +82,7 @@ export async function POST(request: Request) {
     filedBy: session.userId,
     status: "PENDING"
   })
+  await logAction(session, "CREATED_CLAIM", "Claim", claim._id.toString(), null, { claimNumber, policy: policy._id.toString(), claimType: claim.claimType, claimAmount: claim.claimAmount }, request)
 
   return NextResponse.json({ success: true, data: claim })
 }

@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db"
 import { getSession, requireRole } from "@/lib/auth"
 import { Branch } from "@/models/Branch"
 import { User } from "@/models/User"
+import { logAction } from "@/lib/audit"
 
 export async function GET(
   request: Request,
@@ -50,6 +51,7 @@ export async function PATCH(
   }
 
   const body = await request.json()
+  const oldValue = branch.toObject()
   const updates: any = {}
   if (body.name) updates.name = body.name
   if (body.code) updates.code = body.code.toUpperCase()
@@ -68,6 +70,7 @@ export async function PATCH(
     if (activeUsers > 0) {
       Object.assign(branch, updates)
       await branch.save()
+      await logAction(session, "UPDATED_BRANCH", "Branch", branch._id.toString(), oldValue, branch.toObject(), request)
       return NextResponse.json({
         success: true,
         warning: "This branch still has active users under it.",
@@ -78,6 +81,7 @@ export async function PATCH(
 
   Object.assign(branch, updates)
   await branch.save()
+  await logAction(session, "UPDATED_BRANCH", "Branch", branch._id.toString(), oldValue, branch.toObject(), request)
 
   return NextResponse.json({ success: true, data: branch })
 }
@@ -101,5 +105,6 @@ export async function DELETE(
   }
 
   await branch.deleteOne()
+  await logAction(session, "DELETED_BRANCH", "Branch", branch._id.toString(), branch.toObject(), null, request)
   return NextResponse.json({ success: true, data: { id: params.id } })
 }

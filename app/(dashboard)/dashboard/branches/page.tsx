@@ -1,21 +1,14 @@
-import { BranchManagement } from "@/components/shared/BranchManagement"
+import { BranchCards } from "@/components/shared/BranchCards"
 import { PageHeader } from "@/components/shared/PageHeader"
 
-async function fetchBranches() {
-  const res = await fetch("/api/branches", { cache: "no-store" })
-  return res.json()
-}
-
-export default async function BranchesPage() {
-  const data = await fetchBranches()
-
+export default function BranchesPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Branch management"
-        description="Create branch offices, assign branch managers, and keep branch status updated."
+        title="Branches"
+        description="Branch operations at a glance. Open a branch to see collections, people, and performance."
       />
-      {data.success ? <BranchManagement initialBranches={data.data} /> : <p className="text-sm text-destructive">Failed to load branches.</p>}
+      <BranchCards />
     </div>
   )
 }

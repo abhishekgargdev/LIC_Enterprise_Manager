@@ -1,0 +1,16 @@
+"use client"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { useEffect, useState } from "react"
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { StatCard } from "@/components/shared/StatCard"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+
+export function BranchPerformance({ branchId }: { branchId: string }) {
+  const [data, setData] = useState<any>(null)
+  useEffect(() => { fetch(`/api/branches/${branchId}/performance`).then(r => r.json()).then(d => setData(d.data)) }, [branchId])
+  if (!data) return <p className="text-sm text-muted-foreground">Loading branch performance…</p>
+  const money = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })
+  return <div className="space-y-6"><div><h1 className="text-3xl font-semibold">{data.branch.name}</h1><p className="mt-1 text-muted-foreground">{data.branch.region} · Manager: {data.branch.branchManager?.name || "Unassigned"}</p></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5"><StatCard label="Policies" value={String(data.stats.totalPolicies)} /><StatCard label="Collected this month" value={money.format(data.stats.premiumCollected)} /><StatCard label="Collection rate" value={`${data.stats.collectionRate}%`} /><StatCard label="Renewal rate" value={`${data.stats.renewalRate}%`} /><StatCard label="Claims" value={String(data.stats.claimCount)} /></div><div className="grid gap-6 lg:grid-cols-5"><div className="rounded-[2rem] border border-border bg-card p-6 lg:col-span-3"><h2 className="mb-4 text-lg font-semibold">Monthly collection trend</h2><div className="h-72"><ResponsiveContainer><BarChart data={data.trend}><XAxis dataKey="month" /><YAxis /><Tooltip formatter={(v) => money.format(Number(v))} /><Bar dataKey="total" fill="var(--color-primary, #2563eb)" radius={8} /></BarChart></ResponsiveContainer></div></div><div className="rounded-[2rem] border border-border bg-card p-6 lg:col-span-2"><h2 className="mb-4 text-lg font-semibold">Top agents</h2><div className="space-y-3">{data.topAgents.map((agent: any, index: number) => <div key={agent._id} className="flex items-center justify-between"><span><b className="mr-2">{["🥇", "🥈", "🥉"][index] || `${index + 1}.`}</b>{agent.name}</span><span className="font-medium">{money.format(agent.premium)}</span></div>)}</div></div></div><Tabs defaultValue="managers"><TabsList><TabsTrigger value="managers">Managers</TabsTrigger><TabsTrigger value="agents">Agents</TabsTrigger><TabsTrigger value="customers">Customers</TabsTrigger></TabsList>{["managers", "agents", "customers"].map(tab => <TabsContent key={tab} value={tab}><div className="mt-4 rounded-3xl border border-border p-4">{tab === "customers" ? "Customer records are available from the Customers directory, filtered to this branch." : <div className="space-y-2">{data.users.filter((user: any) => tab === "agents" ? user.role === "AGENT" : ["BRANCH_MANAGER", "DEVELOPMENT_OFFICER"].includes(user.role)).map((user: any) => <div key={user._id} className="flex justify-between rounded-xl bg-muted/40 p-3"><span>{user.name} <span className="text-muted-foreground">{user.email}</span></span><Badge>{user.role.replaceAll("_", " ")}</Badge></div>)}</div>}</div></TabsContent>)}</Tabs></div>
+}

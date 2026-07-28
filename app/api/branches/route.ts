@@ -4,6 +4,7 @@ import { getSession, requireRole } from "@/lib/auth"
 import { Branch } from "@/models/Branch"
 import { Region } from "@/models/Region"
 import { User } from "@/models/User"
+import { logAction } from "@/lib/audit"
 
 export async function GET() {
   await connectDB()
@@ -70,5 +71,6 @@ export async function POST(request: Request) {
   }
 
   const branch = await Branch.create(branchData)
+  await logAction(session, "CREATED_BRANCH", "Branch", branch._id.toString(), null, branch.toObject(), request)
   return NextResponse.json({ success: true, data: branch })
 }

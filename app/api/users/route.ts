@@ -6,6 +6,7 @@ import { buildAccessFilter, canCreateRole, type UserRole } from "@/lib/permissio
 import { Branch } from "@/models/Branch"
 import { User } from "@/models/User"
 import { notify } from "@/lib/notifications"
+import { logAction } from "@/lib/audit"
 
 const roles: UserRole[] = ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"]
 
@@ -91,6 +92,7 @@ export async function POST(request: Request) {
         relatedId: user._id.toString()
       })
     }
+    await logAction(session, "CREATED_USER", "User", user._id.toString(), null, { name: user.name, email: user.email, role: user.role, branch: user.branch }, request)
     return NextResponse.json({ success: true, data: user.toObject(), temporaryPassword: initialPassword })
   } catch (error: unknown) {
     if (error?.code === 11000) return NextResponse.json({ success: false, error: "A user with that email already exists." }, { status: 409 })
