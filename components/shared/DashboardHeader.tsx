@@ -106,7 +106,7 @@ export function DashboardHeader({ role }: DashboardHeaderProps) {
     }
     setIsOpen(false)
     if (item.link) {
-      router.push(item.link)
+      router.push(item.link as any)
     }
   }
 

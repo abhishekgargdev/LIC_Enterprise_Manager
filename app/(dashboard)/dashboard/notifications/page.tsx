@@ -98,7 +98,7 @@ export default function NotificationsPage() {
       await markRead.mutateAsync(item._id)
     }
     if (item.link) {
-      router.push(item.link)
+      router.push(item.link as any)
     }
   }
 

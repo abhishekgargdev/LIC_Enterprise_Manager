@@ -1,18 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 
 export function StatCard({
   label,
   value,
   delta,
   description,
+  href,
 }: {
   label: string
   value: string
   delta?: string
   description?: string
+  href?: string
 }) {
-  return (
-    <Card className="rounded-[2rem] border border-border bg-card p-6 shadow-sm shadow-black/5">
+  const cardContent = (
+    <Card className="rounded-[2rem] border border-border bg-card p-6 shadow-sm shadow-black/5 hover:bg-muted/5 transition-all">
       <CardHeader>
         <CardTitle>{label}</CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
@@ -27,4 +30,14 @@ export function StatCard({
       </CardContent>
     </Card>
   )
+
+  if (href) {
+    return (
+      <Link href={href} className="block hover:scale-[1.01] transition-transform">
+        {cardContent}
+      </Link>
+    )
+  }
+
+  return cardContent
 }

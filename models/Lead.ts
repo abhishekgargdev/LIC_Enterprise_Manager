@@ -1,3 +1,8 @@
 import mongoose from "mongoose"
 const leadSchema = new mongoose.Schema({ name: { type: String, required: true }, mobile: { type: String, required: true }, email: String, source: { type: String, enum: ["REFERRAL", "WALK_IN", "PHONE", "OTHER"], required: true }, interestedPlan: String, stage: { type: String, enum: ["NEW", "CONTACTED", "MEETING_SCHEDULED", "PROPOSAL_SUBMITTED", "NEGOTIATION", "CONVERTED", "LOST"], default: "NEW" }, agent: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, notes: [{ text: String, createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, createdAt: { type: Date, default: Date.now } }], nextFollowUpDate: Date, convertedToCustomer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" }, lostReason: String }, { timestamps: true })
+
+leadSchema.index({ agent: 1 })
+leadSchema.index({ stage: 1 })
+leadSchema.index({ nextFollowUpDate: 1 })
+
 export const Lead = mongoose.models.Lead || mongoose.model("Lead", leadSchema)

@@ -50,4 +50,10 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
+userSchema.index({ role: 1 })
+userSchema.index({ branch: 1 })
+userSchema.index({ region: 1 })
+userSchema.index({ manager: 1 })
+userSchema.index({ isActive: 1 })
+
 export const User = mongoose.models.User || mongoose.model("User", userSchema)

@@ -11,6 +11,10 @@ const customerSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true }, notes: String,
 }, { timestamps: true })
 
+customerSchema.index({ agent: 1 })
+customerSchema.index({ branch: 1 })
+customerSchema.index({ isActive: 1 })
+
 customerSchema.index({ branch: 1, panNumber: 1 }, { unique: true, partialFilterExpression: { panNumber: { $type: "string", $ne: "" } } })
 customerSchema.index({ branch: 1, aadhaarNumber: 1 }, { unique: true, partialFilterExpression: { aadhaarNumber: { $type: "string", $ne: "" } } })
 export const Customer = mongoose.models.Customer || mongoose.model("Customer", customerSchema)
