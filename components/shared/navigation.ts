@@ -22,6 +22,9 @@ export type RouteHref =
   | "/dashboard/regions"
   | "/dashboard/branches"
   | "/dashboard/policy-assignment"
+  | "/dashboard/premiums"
+  | "/dashboard/renewals"
+  | "/dashboard/commissions"
 
 export type NavigationItem = {
   title: string
@@ -91,6 +94,9 @@ const navigationItems: NavigationItem[] = [
     icon: Users,
     roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"],
   },
+  { title: "Premiums", href: "/dashboard/premiums", icon: FileText, roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"] },
+  { title: "Renewals", href: "/dashboard/renewals", icon: Bell, roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"] },
+  { title: "Commissions", href: "/dashboard/commissions", icon: Sparkles, roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"] },
   { title: "Policy assignment", href: "/dashboard/policy-assignment", icon: Users2, roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"] },
   {
     title: "Regions",
