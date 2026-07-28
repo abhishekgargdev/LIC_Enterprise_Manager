@@ -15,6 +15,7 @@ export type RouteHref =
   | "/dashboard/customers"
   | "/dashboard/policies"
   | "/dashboard/leads"
+  | "/dashboard/claims"
   | "/dashboard/notifications"
   | "/dashboard/team"
   | "/dashboard/users"
@@ -66,9 +67,9 @@ const navigationItems: NavigationItem[] = [
   },
   {
     title: "Claims",
-    href: "/dashboard/notifications",
+    href: "/dashboard/claims",
     icon: ShieldCheck,
-    roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER"],
+    roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"],
   },
   {
     title: "Notifications",
