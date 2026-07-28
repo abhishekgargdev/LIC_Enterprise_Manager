@@ -6,6 +6,7 @@ import { Policy } from "@/models/Policy"
 import { PolicyHistory } from "@/models/PolicyHistory"
 import { User } from "@/models/User"
 import { notify } from "@/lib/notifications"
+import { logAction } from "@/lib/audit"
 
 const next: Record<string, string[]> = { PENDING: ["UNDER_REVIEW"], UNDER_REVIEW: ["APPROVED", "REJECTED"], APPROVED: ["SETTLED"], REJECTED: [], SETTLED: [] }
 
@@ -52,6 +53,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ success: false, error: "A rejection reason is required." }, { status: 400 })
   }
 
+  const oldValue = {
+    status: claim.status,
+    description: claim.description,
+    approvedAmount: claim.approvedAmount,
+    rejectionReason: claim.rejectionReason,
+  }
+
   if (body.status) {
     claim.status = body.status
     claim.reviewedBy = session.userId
@@ -70,6 +78,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   await claim.save()
+
+  const newValue = {
+    status: claim.status,
+    description: claim.description,
+    approvedAmount: claim.approvedAmount,
+    rejectionReason: claim.rejectionReason,
+  }
+
+  await logAction(session, "UPDATED_CLAIM", "Claim", claim._id.toString(), oldValue, newValue, request)
 
   if (body.status) {
     const policy = await Policy.findById(claim.policy)

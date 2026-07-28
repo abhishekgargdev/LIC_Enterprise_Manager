@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/db"
 import { getSession, requireRole } from "@/lib/auth"
 import { User } from "@/models/User"
 import { Branch } from "@/models/Branch"
-import { AuditLog } from "@/models/AuditLog"
+import { logAction } from "@/lib/audit"
 
 export async function POST(request: Request) {
   await connectDB()
@@ -48,22 +48,27 @@ export async function POST(request: Request) {
   }
 
   const previousBranch = agent.branch
+  const previousManager = agent.manager ? agent.manager.toString() : null
+  const previousRegion = agent.region
+
+  const oldValue = {
+    branch: previousBranch,
+    manager: previousManager,
+    region: previousRegion,
+  }
+
   agent.branch = targetBranch.code
   agent.manager = manager._id
   agent.region = targetBranch.region
   await agent.save()
 
-  await AuditLog.create({
-    actor: user.userId,
-    action: "transfer_agent",
-    targetType: "User",
-    targetId: agent._id.toString(),
-    details: {
-      fromBranch: previousBranch,
-      toBranch: targetBranch.code,
-      newManager: manager._id.toString(),
-    },
-  })
+  const newValue = {
+    branch: agent.branch,
+    manager: agent.manager ? agent.manager.toString() : null,
+    region: agent.region,
+  }
+
+  await logAction(session, "TRANSFER_AGENT", "User", agent._id.toString(), oldValue, newValue, request)
 
   return NextResponse.json({ success: true, data: { agentId: agent._id.toString() } })
 }

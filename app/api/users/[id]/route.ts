@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth"
 import { canCreateRole } from "@/lib/permissions"
 import { User } from "@/models/User"
 import { notify } from "@/lib/notifications"
+import { logAction } from "@/lib/audit"
 
 async function accessible(id: string) {
   const session = await getSession()
@@ -42,7 +43,23 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       })
     }
   }
+  const oldValue = {
+    role: user.role,
+    branch: user.branch,
+    manager: user.manager ? user.manager.toString() : null,
+    isActive: user.isActive
+  }
+
   Object.assign(user, updates); await user.save()
+
+  const newValue = {
+    role: user.role,
+    branch: user.branch,
+    manager: user.manager ? user.manager.toString() : null,
+    isActive: user.isActive
+  }
+
+  await logAction(session, "UPDATED_USER", "User", user._id.toString(), oldValue, newValue, request)
   return NextResponse.json({ success: true, data: user.toObject() })
 }
 

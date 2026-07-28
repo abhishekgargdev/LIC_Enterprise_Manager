@@ -22,7 +22,7 @@ export async function GET(
     return NextResponse.json({ success: false, error: "Region not found." }, { status: 404 })
   }
 
-  if (session.role === "REGIONAL_ADMIN" && region.code !== session.region) {
+  if (user.role === "REGIONAL_ADMIN" && region.code !== user.region) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
 
@@ -43,7 +43,7 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: "Region not found." }, { status: 404 })
   }
 
-  if (session.role === "REGIONAL_ADMIN" && region.code !== session.region) {
+  if (user.role === "REGIONAL_ADMIN" && region.code !== user.region) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
 
@@ -93,7 +93,7 @@ export async function DELETE(
     return NextResponse.json({ success: false, error: "Region not found." }, { status: 404 })
   }
 
-  if (session.role === "REGIONAL_ADMIN" && region.code !== session.region) {
+  if (user.role === "REGIONAL_ADMIN" && region.code !== user.region) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
 
