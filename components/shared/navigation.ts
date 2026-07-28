@@ -28,6 +28,8 @@ export type RouteHref =
   | "/dashboard/commissions"
   | "/dashboard/reports"
   | "/dashboard/audit-logs"
+  | "/dashboard/calendar"
+  | "/dashboard/tasks"
 
 
 export type NavigationItem = {
@@ -50,6 +52,8 @@ const navigationItems: NavigationItem[] = [
       "AGENT",
     ],
   },
+  { title: "Calendar", href: "/dashboard/calendar", icon: Bell, roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"] },
+  { title: "Tasks", href: "/dashboard/tasks", icon: Users2, roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"] },
   {
     title: "Customers",
     href: "/dashboard/customers",

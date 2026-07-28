@@ -10,6 +10,7 @@ import { Premium } from "@/models/Premium"
 import { Claim } from "@/models/Claim"
 import { Lead } from "@/models/Lead"
 import { Commission } from "@/models/Commission"
+import { Task } from "@/models/Task"
 
 export async function GET() {
   try {
@@ -312,6 +313,8 @@ export async function GET() {
         agent: userId,
         status: "LAPSED"
       })
+      const openTasks = await Task.countDocuments({ assignedTo: userId, status: { $ne: "DONE" } })
+      const tasksDueToday = await Task.countDocuments({ assignedTo: userId, status: { $ne: "DONE" }, dueDate: { $gte: todayStart, $lte: todayEnd } })
 
       // Action Lists: Renewals due (up to 5)
       const renewalsList = await Premium.find({
@@ -365,6 +368,8 @@ export async function GET() {
             { label: "Follow-ups Today", value: followUpCount.toString(), href: "/dashboard/leads" },
             { label: "New Leads", value: newLeadsCount.toString(), href: "/dashboard/leads" },
             { label: "Lapsed Policies", value: lapsedCount.toString(), href: "/dashboard/policies?status=LAPSED" }
+            ,{ label: "My Open Tasks", value: openTasks.toString(), href: "/dashboard/tasks" }
+            ,{ label: "Tasks Due Today", value: tasksDueToday.toString(), href: "/dashboard/tasks" }
           ],
           renewals: parsedRenewals,
           followups: parsedFollowups
