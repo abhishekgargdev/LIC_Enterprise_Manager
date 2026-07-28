@@ -1,0 +1,3 @@
+import { Policy } from "@/models/Policy"
+import { Notification } from "@/models/Notification"
+export async function runDailyExpiryCheck() { const policies = await Policy.find({ status: { $in: ["ACTIVE", "PENDING"] }, maturityDate: { $lt: new Date() } }); for (const policy of policies) { policy.status = "MATURED"; await policy.save(); await Notification.updateOne({ dedupeKey: `policy-matured-${policy._id}` }, { $setOnInsert: { recipient: policy.agent, type: "POLICY_MATURED", title: "Policy matured", message: `${policy.policyNumber} has reached maturity.`, entityType: "Policy", entityId: policy._id.toString(), dedupeKey: `policy-matured-${policy._id}` } }, { upsert: true }) } return { matured: policies.length } }
