@@ -8,8 +8,13 @@ import { AuditLog } from "@/models/AuditLog"
 export async function POST(request: Request) {
   await connectDB()
   const session = await getSession()
+  if (!session) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  }
+
+  let user
   try {
-    requireRole(session, ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER"])
+    user = requireRole(session, ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER"])
   } catch (error) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
@@ -35,10 +40,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: "Target branch not found." }, { status: 404 })
   }
 
-  if (session.role === "REGIONAL_ADMIN" && targetBranch.region !== session.region) {
+  if (user.role === "REGIONAL_ADMIN" && targetBranch.region !== user.region) {
     return NextResponse.json({ success: false, error: "Regional admin may only transfer within their region." }, { status: 403 })
   }
-  if (session.role === "BRANCH_MANAGER" && targetBranch.code !== session.branch) {
+  if (user.role === "BRANCH_MANAGER" && targetBranch.code !== user.branch) {
     return NextResponse.json({ success: false, error: "Branch manager may only transfer agents inside their own branch." }, { status: 403 })
   }
 
@@ -49,7 +54,7 @@ export async function POST(request: Request) {
   await agent.save()
 
   await AuditLog.create({
-    actor: session.userId,
+    actor: user.userId,
     action: "transfer_agent",
     targetType: "User",
     targetId: agent._id.toString(),

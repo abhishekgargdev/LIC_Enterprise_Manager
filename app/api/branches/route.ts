@@ -27,8 +27,13 @@ export async function GET() {
 export async function POST(request: Request) {
   await connectDB()
   const session = await getSession()
+  if (!session) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  }
+
+  let user
   try {
-    requireRole(session, ["SUPER_ADMIN", "REGIONAL_ADMIN"])
+    user = requireRole(session, ["SUPER_ADMIN", "REGIONAL_ADMIN"])
   } catch (error) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
@@ -40,7 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: "Name, code, and region are required." }, { status: 400 })
   }
 
-  if (session.role === "REGIONAL_ADMIN" && region.toUpperCase() !== session.region) {
+  if (user.role === "REGIONAL_ADMIN" && region.toUpperCase() !== user.region) {
     return NextResponse.json({ success: false, error: "Regional admins may only create branches in their own region." }, { status: 403 })
   }
 

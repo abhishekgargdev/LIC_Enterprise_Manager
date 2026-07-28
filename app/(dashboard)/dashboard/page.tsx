@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { RevenueTrendChart, BranchPerformanceChart } from "@/components/shared/DashboardCharts"
 import Link from "next/link"
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import {
   ShieldAlert,
   ArrowRight,
@@ -163,7 +165,7 @@ export default function DashboardPage() {
                       summary.leaderboard.map((agent: any) => (
                         <tr key={agent._id} className="border-b border-border/40 hover:bg-muted/10 transition-colors">
                           <td className="py-4.5 font-bold text-foreground">
-                            <Link href={`/dashboard/users/${agent._id}`} className="hover:underline text-primary">
+                            <Link href={`/dashboard/users/${agent._id}` as any} className="hover:underline text-primary">
                               {agent.name}
                             </Link>
                           </td>
@@ -220,7 +222,7 @@ export default function DashboardPage() {
                       summary.leaderboard.map((agent: any) => (
                         <tr key={agent._id} className="border-b border-border/40 hover:bg-muted/10 transition-colors">
                           <td className="py-4.5 font-bold text-foreground">
-                            <Link href={`/dashboard/users/${agent._id}`} className="hover:underline text-primary">
+                            <Link href={`/dashboard/users/${agent._id}` as any} className="hover:underline text-primary">
                               {agent.name}
                             </Link>
                           </td>
@@ -264,11 +266,12 @@ export default function DashboardPage() {
                   <CardTitle className="text-lg font-bold">Renewals Due Today</CardTitle>
                   <CardDescription>Active policy renewals due for follow-up</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" asChild className="rounded-full">
-                  <Link href="/dashboard/premiums?status=DUE" className="inline-flex items-center gap-1">
-                    View all <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
+                <Link
+                  href="/dashboard/premiums?status=DUE"
+                  className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "rounded-full inline-flex items-center gap-1")}
+                >
+                  View all <ArrowRight className="size-4" />
+                </Link>
               </CardHeader>
               <CardContent className="px-0 pb-0 space-y-3">
                 {summary.renewals && summary.renewals.length > 0 ? (
@@ -305,11 +308,12 @@ export default function DashboardPage() {
                   <CardTitle className="text-lg font-bold">Lead Follow-ups Today</CardTitle>
                   <CardDescription>Prospect lead tasks with deadlines today</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" asChild className="rounded-full">
-                  <Link href="/dashboard/leads" className="inline-flex items-center gap-1">
-                    View all <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
+                <Link
+                  href="/dashboard/leads"
+                  className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "rounded-full inline-flex items-center gap-1")}
+                >
+                  View all <ArrowRight className="size-4" />
+                </Link>
               </CardHeader>
               <CardContent className="px-0 pb-0 space-y-3">
                 {summary.followups && summary.followups.length > 0 ? (

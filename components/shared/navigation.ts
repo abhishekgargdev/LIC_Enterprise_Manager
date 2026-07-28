@@ -26,6 +26,8 @@ export type RouteHref =
   | "/dashboard/premiums"
   | "/dashboard/renewals"
   | "/dashboard/commissions"
+  | "/dashboard/reports"
+
 
 export type NavigationItem = {
   title: string
@@ -110,6 +112,12 @@ const navigationItems: NavigationItem[] = [
     href: "/dashboard/branches",
     icon: Bell,
     roles: ["SUPER_ADMIN", "REGIONAL_ADMIN"],
+  },
+  {
+    title: "Reports",
+    href: "/dashboard/reports",
+    icon: FileText,
+    roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"],
   },
 ]
 

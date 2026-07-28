@@ -96,7 +96,7 @@ export async function DELETE(
     return NextResponse.json({ success: false, error: "Branch not found." }, { status: 404 })
   }
 
-  if (session.role === "REGIONAL_ADMIN" && branch.region !== session.region) {
+  if (user.role === "REGIONAL_ADMIN" && branch.region !== user.region) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
   }
 
