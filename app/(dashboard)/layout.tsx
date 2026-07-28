@@ -1,15 +1,4 @@
-import type { Metadata } from "next"
-import Link from "next/link"
-import { Bell } from "lucide-react"
-import { AppSidebar } from "@/components/shared/AppSidebar"
-import { MobileBottomNav } from "@/components/shared/MobileBottomNav"
-import { ThemeToggle } from "@/components/shared/ThemeToggle"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import type { UserRole } from "@/lib/permissions"
-
-export const metadata: Metadata = {
-  title: "LIC Enterprise Dashboard",
-}
 
 export default function DashboardLayout({
   children,
@@ -20,7 +9,6 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppSidebar role={role} />
       <div className="md:ml-80">
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between gap-4 border-b border-border bg-background/95 px-4 backdrop-blur-sm md:px-8">
           <div className="flex items-center gap-3">
@@ -29,32 +17,11 @@ export default function DashboardLayout({
             </div>
             <p className="text-sm text-muted-foreground">Role: {role.replace("_", " ")}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground transition hover:text-foreground"
-              aria-label="Notifications"
-            >
-              <Bell className="size-5" />
-            </button>
-            <ThemeToggle />
-            <div className="hidden items-center gap-3 rounded-3xl border border-border bg-card px-3 py-2 md:flex">
-              <Avatar>
-                <AvatarFallback>SA</AvatarFallback>
-              </Avatar>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-foreground">Super Admin</p>
-                <p className="text-xs text-muted-foreground">super_admin@lic.local</p>
-              </div>
-            </div>
-          </div>
         </header>
-
         <main className="min-h-[calc(100vh-5rem)] px-4 py-6 md:px-8">
           {children}
         </main>
       </div>
-      <MobileBottomNav role={role} />
     </div>
   )
 }
