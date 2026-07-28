@@ -1,0 +1,4 @@
+import { Premium } from "@/models/Premium"
+type PolicySchedule = { _id: unknown; startDate: Date | string; policyTerm: number; premiumAmount: number; premiumMode: string }
+const months: Record<string, number> = { MONTHLY: 1, QUARTERLY: 3, HALF_YEARLY: 6, YEARLY: 12, SINGLE: 0 }
+export async function generateScheduleForPolicy(policy: PolicySchedule) { const interval = months[policy.premiumMode] ?? 12; const count = interval === 0 ? 1 : Math.ceil((Number(policy.policyTerm) * 12) / interval); const start = new Date(policy.startDate); const rows = Array.from({ length: count }, (_, index) => { const dueDate = new Date(start); dueDate.setMonth(dueDate.getMonth() + index * interval); return { policy: policy._id, dueDate, amount: policy.premiumAmount, status: "DUE" } }); if (rows.length) await Premium.insertMany(rows, { ordered: false }).catch((error: { code?: number }) => { if (error.code !== 11000) throw error }) }
