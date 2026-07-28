@@ -430,7 +430,7 @@ export async function GET(request: Request) {
       const doc = React.createElement(ReportDocument, { type, data, fromDate, toDate })
       const pdfBuffer = await pdf(doc).toBuffer()
 
-      return new Response(pdfBuffer, {
+      return new Response(pdfBuffer as any, {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="${type}-report.pdf"`

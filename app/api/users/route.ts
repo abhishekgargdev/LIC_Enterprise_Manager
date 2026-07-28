@@ -45,7 +45,7 @@ export async function GET(request: Request) {
   if (search) filter.$or = [{ name: { $regex: search, $options: "i" } }, { email: { $regex: search, $options: "i" } }, { employeeCode: { $regex: search, $options: "i" } }, { agentCode: { $regex: search, $options: "i" } }]
 
   // Explicitly scope every directory query through the central permission helper.
-  const scopedFilter = buildAccessFilter({ role: session.role, region: session.region, branch: session.branch, manager: session.manager, agent: session.userId }, filter)
+  const scopedFilter = buildAccessFilter({ role: session.role, region: session.region, branch: session.branch, manager: session.manager, agent: session.userId }, filter) as any
   if (session.role === "DEVELOPMENT_OFFICER") scopedFilter.manager = session.userId
   if (session.role === "AGENT") scopedFilter._id = session.userId
   const users = await User.find(scopedFilter).select("-passwordHash").populate("manager", "name role").sort({ createdAt: -1 }).lean()
