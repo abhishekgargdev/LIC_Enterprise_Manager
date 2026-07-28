@@ -1,14 +1,8 @@
-import { EmptyState } from "@/components/shared/EmptyState"
+import { PageHeader } from "@/components/shared/PageHeader"
+import { PolicyManagement } from "@/components/shared/PolicyManagement"
 
 export default function PoliciesPage() {
   return (
-    <div className="grid min-h-[60vh] place-items-center">
-      <EmptyState
-        title="Policies coming soon"
-        description="This section will include policy management, commissions, and hierarchy-aware policy access."
-        actionLabel="Back to dashboard"
-        actionHref="/dashboard"
-      />
-    </div>
+    <div><PageHeader title="Policy management" description="Create and track insurance policy lifecycles." /><PolicyManagement /></div>
   )
 }
