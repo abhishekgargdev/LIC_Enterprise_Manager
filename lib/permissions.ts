@@ -15,6 +15,20 @@ export type UserContext = {
 
 export type AccessScope = Partial<Pick<UserContext, "region" | "branch" | "manager" | "agent">>
 
+/** Roles that may be provisioned by each staff level. Super admins are seeded,
+ * rather than provisioned from the day-to-day staff screen. */
+export const creatableRoles: Record<UserRole, UserRole[]> = {
+  SUPER_ADMIN: ["REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"],
+  REGIONAL_ADMIN: ["BRANCH_MANAGER", "DEVELOPMENT_OFFICER", "AGENT"],
+  BRANCH_MANAGER: ["DEVELOPMENT_OFFICER", "AGENT"],
+  DEVELOPMENT_OFFICER: ["AGENT"],
+  AGENT: [],
+}
+
+export function canCreateRole(user: Pick<UserContext, "role"> | null, role: UserRole) {
+  return Boolean(user && creatableRoles[user.role].includes(role))
+}
+
 export function hasRole(user: UserContext | null, roles: UserRole | UserRole[]) {
   if (!user) return false
   const allowedRoles = Array.isArray(roles) ? roles : [roles]

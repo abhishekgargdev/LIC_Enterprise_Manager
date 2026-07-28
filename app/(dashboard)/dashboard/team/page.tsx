@@ -1,14 +1,11 @@
-import { EmptyState } from "@/components/shared/EmptyState"
+import { PageHeader } from "@/components/shared/PageHeader"
+import { UserManagement } from "@/components/shared/UserManagement"
 
 export default function TeamPage() {
   return (
-    <div className="grid min-h-[60vh] place-items-center">
-      <EmptyState
-        title="Team workspace coming soon"
-        description="Team hierarchy, branch assignments and manager dashboards will be available here." 
-        actionLabel="Back to dashboard"
-        actionHref="/dashboard"
-      />
+    <div>
+      <PageHeader title="User management" description="Create, manage, and reassign staff in your permitted scope." />
+      <UserManagement />
     </div>
   )
 }

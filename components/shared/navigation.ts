@@ -17,6 +17,7 @@ export type RouteHref =
   | "/dashboard/leads"
   | "/dashboard/notifications"
   | "/dashboard/team"
+  | "/dashboard/users"
   | "/dashboard/hierarchy"
   | "/dashboard/regions"
   | "/dashboard/branches"
@@ -79,7 +80,7 @@ const navigationItems: NavigationItem[] = [
   },
   {
     title: "Team",
-    href: "/dashboard/team",
+    href: "/dashboard/users",
     icon: Users2,
     roles: ["SUPER_ADMIN", "REGIONAL_ADMIN", "BRANCH_MANAGER", "DEVELOPMENT_OFFICER"],
   },
