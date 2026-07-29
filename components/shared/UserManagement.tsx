@@ -28,7 +28,7 @@ export function UserManagement() {
   const [open, setOpen] = useState(false)
   const [profile, setProfile] = useState<User | null>(null)
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null)
-  const form = useForm<FormValues>({ resolver: zodResolver(formSchema), defaultValues: { name: "", email: "", phone: "", role: "", branch: "", managerId: "" } })
+  const form = useForm<FormValues>({ resolver: zodResolver(formSchema) as any, defaultValues: { name: "", email: "", phone: "", role: "", branch: "", managerId: "" } })
   const selectedRole = form.watch("role")
 
   const load = async () => {

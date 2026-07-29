@@ -56,7 +56,7 @@ export function RegionManagement({ initialRegions }: { initialRegions: any[] }) 
       }
       setRegions((current) => current.map((item) => (item._id === regionId ? { ...item, isActive: data.data.isActive } : item)))
       if (data.warning) {
-        toast.warn(data.warning)
+        toast.warning(data.warning)
       } else {
         toast.success("Region updated.")
       }

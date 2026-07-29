@@ -60,7 +60,7 @@ export function BranchManagement({ initialBranches }: { initialBranches: any[] }
       }
       setBranches((current) => current.map((item) => (item._id === branchId ? { ...item, isActive: data.data.isActive } : item)))
       if (data.warning) {
-        toast.warn(data.warning)
+        toast.warning(data.warning)
       } else {
         toast.success("Branch updated.")
       }

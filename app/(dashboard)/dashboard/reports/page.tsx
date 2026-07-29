@@ -66,7 +66,7 @@ export default function ReportsPage() {
       return res.json()
     },
   })
-  const user = userJson?.success ? userJson.data : null
+  const user = userJson?.success ? userJson.data.user : null
 
   // Fetch branch options
   const { data: branchJson } = useQuery({

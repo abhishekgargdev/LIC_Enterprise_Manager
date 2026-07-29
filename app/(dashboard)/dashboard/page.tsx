@@ -53,7 +53,7 @@ export default function DashboardPage() {
     },
   })
 
-  const user = userJson?.success ? userJson.data : null
+  const user = userJson?.success ? userJson.data.user : null
   const summary = summaryJson?.success ? summaryJson.data : null
 
   if (userLoading || summaryLoading) {

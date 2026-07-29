@@ -33,7 +33,7 @@ export function StatCard({
 
   if (href) {
     return (
-      <Link href={href} className="block hover:scale-[1.01] transition-transform">
+      <Link href={href as any} className="block hover:scale-[1.01] transition-transform">
         {cardContent}
       </Link>
     )

@@ -44,16 +44,16 @@ export function HierarchyDashboard({ tree }: HierarchyDashboardProps) {
     const managers: ManagerOption[] = []
     const branches: BranchOption[] = []
 
-    tree.forEach((region) => {
-      region.branches.forEach((branch) => {
+    tree.forEach((region: any) => {
+      region.branches.forEach((branch: any) => {
         branches.push({ code: branch.code, name: branch.name })
-        branch.managers.forEach((manager) => {
+        branch.managers.forEach((manager: any) => {
           managers.push({ id: manager.id, name: manager.name, branchCode: branch.code })
-          manager.agents.forEach((agent) => {
+          manager.agents.forEach((agent: any) => {
             agents.push({ id: agent.id, name: agent.name, branchCode: branch.code, managerId: manager.id })
           })
         })
-        branch.agents.forEach((agent) => {
+        branch.agents.forEach((agent: any) => {
           agents.push({ id: agent.id, name: agent.name, branchCode: branch.code })
         })
       })
@@ -115,9 +115,7 @@ export function HierarchyDashboard({ tree }: HierarchyDashboardProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-              <DialogTrigger asChild>
-                <Button>Open transfer dialog</Button>
-              </DialogTrigger>
+              <DialogTrigger render={<Button>Open transfer dialog</Button>} />
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Transfer agent</DialogTitle>
@@ -128,7 +126,7 @@ export function HierarchyDashboard({ tree }: HierarchyDashboardProps) {
                 <div className="space-y-4 py-2">
                   <div className="space-y-2">
                     <Label htmlFor="agent-select">Agent</Label>
-                    <Select value={agentId} onValueChange={setAgentId}>
+                    <Select value={agentId} onValueChange={(val) => setAgentId(val ?? "")}>
                       <SelectTrigger id="agent-select">
                         <SelectValue>{agentId ? options.agents.find((item) => item.id === agentId)?.name : "Select agent"}</SelectValue>
                       </SelectTrigger>
@@ -141,7 +139,7 @@ export function HierarchyDashboard({ tree }: HierarchyDashboardProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="branch-select">Branch</Label>
-                    <Select value={branchCode} onValueChange={setBranchCode}>
+                    <Select value={branchCode} onValueChange={(val) => setBranchCode(val ?? "")}>
                       <SelectTrigger id="branch-select">
                         <SelectValue>{branchCode ? `${branchCode}` : "Select branch"}</SelectValue>
                       </SelectTrigger>
@@ -154,7 +152,7 @@ export function HierarchyDashboard({ tree }: HierarchyDashboardProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="manager-select">Manager</Label>
-                    <Select value={managerId} onValueChange={setManagerId}>
+                    <Select value={managerId} onValueChange={(val) => setManagerId(val ?? "")}>
                       <SelectTrigger id="manager-select">
                         <SelectValue>{managerId ? options.managers.find((item) => item.id === managerId)?.name : "Select manager"}</SelectValue>
                       </SelectTrigger>

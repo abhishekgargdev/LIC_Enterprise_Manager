@@ -50,7 +50,7 @@ export function RevenueTrendChart({ data }: ChartProps) {
               borderColor: "var(--border)",
               color: "var(--foreground)",
             }}
-            formatter={(value: number) => [`₹${value.toLocaleString()}`, "Collection"]}
+            formatter={(value: any) => [`₹${Number(value || 0).toLocaleString()}`, "Collection"]}
           />
           <Area
             type="monotone"
@@ -88,7 +88,7 @@ export function BranchPerformanceChart({ data }: ChartProps) {
               borderColor: "var(--border)",
               color: "var(--foreground)",
             }}
-            formatter={(value: number) => [`₹${value.toLocaleString()}`, "Collection"]}
+            formatter={(value: any) => [`₹${Number(value || 0).toLocaleString()}`, "Collection"]}
           />
           <Bar
             dataKey="revenue"

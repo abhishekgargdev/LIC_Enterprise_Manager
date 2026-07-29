@@ -90,7 +90,9 @@ export default function PolicyDetailPage() {
     loadClaims()
   }
 
-  useEffect(load, [id])
+  useEffect(() => {
+    load()
+  }, [id])
 
   async function change() {
     const status = prompt("New status (ACTIVE, LAPSED, EXPIRED, MATURED, CANCELLED, CLAIM_SETTLED)")

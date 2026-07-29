@@ -63,7 +63,7 @@ export async function POST(request: Request) {
   if (!canCreateRole(session, role)) return NextResponse.json({ success: false, error: "You cannot create this role." }, { status: 403 })
 
   let branch = suppliedBranch?.toUpperCase()
-  let manager: { _id: unknown; branch?: string } | string | null = null
+  let manager: any = null
   if (session.role === "BRANCH_MANAGER" || session.role === "DEVELOPMENT_OFFICER") branch = session.branch
   if (session.role === "DEVELOPMENT_OFFICER") manager = session.userId
   if (role === "AGENT") {
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     }
     await logAction(session, "CREATED_USER", "User", user._id.toString(), null, { name: user.name, email: user.email, role: user.role, branch: user.branch }, request)
     return NextResponse.json({ success: true, data: user.toObject(), temporaryPassword: initialPassword })
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error?.code === 11000) return NextResponse.json({ success: false, error: "A user with that email already exists." }, { status: 409 })
     throw error
   }
