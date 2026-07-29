@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
@@ -102,7 +102,20 @@ export default function NotificationsPage() {
     }
   }
 
-  const notifications: NotificationItem[] = queryData?.data || []
+  // Load muted types from localStorage
+  const [mutedTypes, setMutedTypes] = useState<string[]>([])
+  useEffect(() => {
+    const stored = localStorage.getItem("mutedNotifications")
+    if (stored) {
+      try {
+        setMutedTypes(JSON.parse(stored))
+      } catch (_) {}
+    }
+  }, [])
+
+  const notifications: NotificationItem[] = (queryData?.data || []).filter(
+    (n: NotificationItem) => !mutedTypes.includes(n.type)
+  )
   const pagination = queryData?.pagination || { total: 0, pages: 1 }
 
   // Group notifications by Today, Yesterday, Earlier

@@ -114,11 +114,6 @@ export default function LoginPage() {
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
-          <div className="mt-6 rounded-lg bg-accent/10 p-4 text-sm text-accent-foreground">
-            <p className="font-semibold">Demo credentials (seed required):</p>
-            <p className="mt-2 truncate text-xs">Email: <code className="font-mono">admin@lic.local</code></p>
-            <p className="truncate text-xs">Password: <code className="font-mono">seedPassword123</code> (after seed-admin)</p>
-          </div>
         </CardContent>
       </Card>
     </div>

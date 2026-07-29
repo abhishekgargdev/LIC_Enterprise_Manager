@@ -30,7 +30,7 @@ export type RouteHref =
   | "/dashboard/audit-logs"
   | "/dashboard/calendar"
   | "/dashboard/tasks"
-
+  | "/dashboard/settings"
 
 export type NavigationItem = {
   title: string

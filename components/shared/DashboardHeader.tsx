@@ -17,6 +17,8 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/shared/ThemeToggle"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
 import type { UserRole } from "@/lib/permissions"
 
 interface DashboardHeaderProps {
@@ -75,8 +77,40 @@ export function DashboardHeader({ role }: DashboardHeaderProps) {
     refetchInterval: 30000,
   })
 
-  const unreadCount = countData || 0
-  const recentNotifications: NotificationItem[] = listData || []
+  // Load muted types from localStorage
+  const [mutedTypes, setMutedTypes] = useState<string[]>([])
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem("mutedNotifications")
+      if (stored) {
+        try {
+          setMutedTypes(JSON.parse(stored))
+        } catch (_) {}
+      } else {
+        setMutedTypes([])
+      }
+    }
+    handleStorageChange()
+    window.addEventListener("storage", handleStorageChange)
+    return () => window.removeEventListener("storage", handleStorageChange)
+  }, [])
+
+  // Fresh user profile details
+  const { data: userData } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      const res = await fetch("/api/auth/me")
+      const json = await res.json()
+      return json.success ? json.data.user : null
+    },
+  })
+
+  const filteredNotifications = (listData || []).filter(
+    (item: NotificationItem) => !mutedTypes.includes(item.type)
+  )
+
+  const unreadCount = filteredNotifications.filter((n: NotificationItem) => !n.isRead).length
+  const recentNotifications: NotificationItem[] = filteredNotifications
 
   // 3. Mark all read mutation
   const markAllRead = useMutation({
@@ -107,6 +141,22 @@ export function DashboardHeader({ role }: DashboardHeaderProps) {
     setIsOpen(false)
     if (item.link) {
       router.push(item.link as any)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" })
+      const json = await res.json()
+      if (json.success) {
+        toast.success("Logged out successfully.")
+        router.push("/login")
+        router.refresh()
+      } else {
+        toast.error(json.error || "Logout failed.")
+      }
+    } catch (err) {
+      toast.error("An error occurred during logout.")
     }
   }
 
@@ -225,15 +275,43 @@ export function DashboardHeader({ role }: DashboardHeaderProps) {
 
         <ThemeToggle />
 
-        <div className="hidden items-center gap-3 rounded-3xl border border-border bg-card px-3 py-2 md:flex">
-          <Avatar>
-            <AvatarFallback>SA</AvatarFallback>
-          </Avatar>
-          <div className="text-left">
-            <p className="text-sm font-semibold text-foreground">Super Admin</p>
-            <p className="text-xs text-muted-foreground">super_admin@lic.local</p>
-          </div>
-        </div>
+        {/* Dynamic User Profile Dropdown Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <button
+                type="button"
+                className="hidden items-center gap-3 rounded-3xl border border-border bg-card px-3 py-2 text-left transition hover:bg-muted/50 md:flex hover:scale-[1.01] active:scale-95 outline-none cursor-pointer"
+              />
+            }
+          >
+            <Avatar>
+              <AvatarFallback>
+                {userData?.name
+                  ? userData.name
+                      .split(" ")
+                      .map((n: string) => n[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()
+                  : "US"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-foreground line-clamp-1">{userData?.name || role.replace("_", " ")}</p>
+              <p className="text-xs text-muted-foreground line-clamp-1">{userData?.email || ""}</p>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl bg-card border p-1.5 shadow-xl">
+            <DropdownMenuItem onClick={() => router.push("/dashboard/settings")} className="rounded-xl cursor-pointer">
+              Profile & Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} variant="destructive" className="rounded-xl cursor-pointer">
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )

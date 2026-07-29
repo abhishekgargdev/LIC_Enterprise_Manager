@@ -16,6 +16,7 @@ import { Task } from "@/models/Task"
 import { Notification } from "@/models/Notification"
 import { AuditLog } from "@/models/AuditLog"
 import { PolicyHistory } from "@/models/PolicyHistory"
+import { PolicyTemplate } from "@/models/PolicyTemplate"
 
 // Load env variables from .env.local
 const envPath = path.resolve(process.cwd(), ".env.local")
@@ -60,6 +61,7 @@ async function main() {
     Notification,
     AuditLog,
     PolicyHistory,
+    PolicyTemplate,
   ]
 
   console.log("Cleaning database collections and dropping indexes...")
@@ -539,6 +541,25 @@ async function main() {
       ipAddress: "127.0.0.1",
       userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
     }
+  ])
+
+  // 16. Seed Policy Templates
+  console.log("Seeding Policy Templates...")
+  await PolicyTemplate.create([
+    {
+      name: "Jeevan Anand Standard (15 Yrs)",
+      planName: "JEEVAN_ANAND",
+      defaultTerm: 15,
+      defaultSumAssured: 500000,
+      defaultCommissionPercent: 15,
+    },
+    {
+      name: "Jeevan Umang High SA (20 Yrs)",
+      planName: "JEEVAN_UMANG",
+      defaultTerm: 20,
+      defaultSumAssured: 1000000,
+      defaultCommissionPercent: 18,
+    },
   ])
 
   console.log("Seeding completed successfully!")
