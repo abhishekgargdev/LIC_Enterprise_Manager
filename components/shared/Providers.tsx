@@ -24,8 +24,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // 2. Listen for custom install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
-      setInstallPrompt(e)
-      setShowBanner(true)
+      
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+      const isDismissed = localStorage.getItem("pwaInstalledOrDismissed") === "true"
+
+      if (!isStandalone && !isDismissed) {
+        setInstallPrompt(e)
+        setShowBanner(true)
+      }
     }
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
@@ -35,11 +41,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const handleDismiss = () => {
+    localStorage.setItem("pwaInstalledOrDismissed", "true")
+    setShowBanner(false)
+  }
+
   const handleInstallClick = async () => {
     if (!installPrompt) return
     installPrompt.prompt()
     const { outcome } = await installPrompt.userChoice
     if (outcome === "accepted") {
+      localStorage.setItem("pwaInstalledOrDismissed", "true")
       setInstallPrompt(null)
       setShowBanner(false)
     }
@@ -62,15 +74,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 </p>
               </div>
               <button
-                onClick={() => setShowBanner(false)}
-                className="rounded-lg p-1 text-muted-foreground hover:bg-muted"
+                onClick={handleDismiss}
+                className="rounded-lg p-1 text-muted-foreground hover:bg-muted cursor-pointer"
                 aria-label="Close"
               >
                 <X className="size-4" />
               </button>
             </div>
             <div className="flex gap-2 justify-end">
-              <Button size="sm" variant="ghost" className="rounded-full text-xs" onClick={() => setShowBanner(false)}>
+              <Button size="sm" variant="ghost" className="rounded-full text-xs" onClick={handleDismiss}>
                 Dismiss
               </Button>
               <Button size="sm" className="rounded-full text-xs font-semibold" onClick={handleInstallClick}>
